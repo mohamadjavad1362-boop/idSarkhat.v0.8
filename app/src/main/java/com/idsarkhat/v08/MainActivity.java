@@ -24,25 +24,43 @@ public class MainActivity extends Activity {
 
         findViewById(R.id.register).setOnClickListener(v -> {
             String last = prefs.getString("last_package", "");
-            if (last.isEmpty()) {
-                status.setText("ابتدا Accessibility را فعال کن و وارد EasyTrader شو.");
-            } else {
-                prefs.edit().putString("target_package", last).apply();
-                status.setText("برنامه هدف ثبت شد: " + last);
-                packageText.setText("EasyTrader هدف: " + last);
+            if (last.isEmpty() || getPackageName().equals(last)) {
+                status.setText("ابتدا Accessibility را فعال کن و داخل EasyTrader بمان، سپس دوباره ثبت را بزن.");
+                return;
             }
+            prefs.edit().putString("target_package", last).apply();
+            status.setText("برنامه هدف ثبت شد: " + last);
+            readData();
         });
 
         findViewById(R.id.read).setOnClickListener(v -> readData());
         readData();
     }
 
+    @Override protected void onResume() {
+        super.onResume();
+        readData();
+    }
+
     private void readData() {
         String last = prefs.getString("last_package", "—");
         String target = prefs.getString("target_package", "—");
+        String detected = prefs.getString("detected_package", "—");
+        String prices = prefs.getString("price_candidates", "");
         String data = prefs.getString("page_text", "");
-        packageText.setText("آخرین برنامه: " + last + "\nبرنامه هدف: " + target);
-        pageText.setText(data.isEmpty() ? "هنوز داده‌ای از صفحه هدف دریافت نشده است." : data);
-        status.setText(data.isEmpty() ? "منتظر داده از EasyTrader" : "داده صفحه دریافت شد");
+        boolean detectedOk = prefs.getBoolean("easytrader_detected", false);
+        long ts = prefs.getLong("page_timestamp", 0L);
+
+        packageText.setText("آخرین برنامه: " + last
+                + "\nبرنامه هدف: " + target
+                + "\nEasyTrader تشخیص داده شد: " + (detectedOk ? "بله" : "خیر")
+                + "\nبسته تشخیص‌داده‌شده: " + detected
+                + "\nآخرین دریافت: " + (ts == 0 ? "—" : new java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.US).format(new java.util.Date(ts))));
+
+        String priceLine = prices.isEmpty() ? "قیمت عددی هنوز استخراج نشده است." : "اعداد/قیمت‌های شناسایی‌شده: " + prices;
+        pageText.setText(priceLine + "\n\n" + (data.isEmpty() ? "متن صفحه هنوز دریافت نشده است." : data));
+        status.setText(detectedOk && !data.isEmpty()
+                ? "✓ صفحه EasyTrader دریافت شد؛ مرحله ارسال سفارش هنوز غیرفعال است."
+                : "منتظر شناسایی صفحه EasyTrader و دریافت داده...");
     }
 }
