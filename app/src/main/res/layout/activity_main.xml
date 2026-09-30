@@ -1,1 +1,23 @@
-<?xml version="1.0" encoding="utf-8"?><LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical" android:padding="12dp" android:layout_width="match_parent" android:layout_height="match_parent"><TextView android:id="@+id/status" android:text="آماده" android:textSize="16sp" android:layout_width="match_parent" android:layout_height="wrap_content"/><EditText android:id="@+id/url" android:hint="آدرس EasyTrader" android:text="https://easytrader.emofid.com/" android:inputType="textUri" android:layout_width="match_parent" android:layout_height="wrap_content"/><Button android:id="@+id/open" android:text="باز کردن / تشخیص صفحه" android:layout_width="match_parent" android:layout_height="wrap_content"/><WebView android:id="@+id/web" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"/></LinearLayout>
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+    <LinearLayout android:orientation="vertical" android:padding="16dp"
+        android:layout_width="match_parent" android:layout_height="wrap_content">
+        <TextView android:id="@+id/status" android:text="آماده" android:textSize="17sp"
+            android:layout_width="match_parent" android:layout_height="wrap_content" android:paddingBottom="10dp"/>
+        <Button android:id="@+id/accessibility" android:text="۱) فعال‌کردن دسترسی خواندن صفحه"
+            android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <Button android:id="@+id/register" android:text="۲) ثبت آخرین برنامه به‌عنوان EasyTrader"
+            android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <Button android:id="@+id/read" android:text="۳) خواندن صفحه و دریافت داده"
+            android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <TextView android:id="@+id/packageText" android:text="آخرین برنامه: —"
+            android:layout_width="match_parent" android:layout_height="wrap_content" android:paddingTop="8dp"/>
+        <TextView android:id="@+id/pageText" android:text="داده‌های صفحه اینجا نمایش داده می‌شود"
+            android:textSize="15sp" android:paddingTop="12dp"
+            android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <TextView android:text="ارسال سفارش واقعی پس از شناسایی دقیق فیلدهای سفارش EasyTrader فعال می‌شود؛ قبل از آن هیچ سفارش واقعی ارسال نمی‌شود."
+            android:textSize="14sp" android:paddingTop="18dp"
+            android:layout_width="match_parent" android:layout_height="wrap_content"/>
+    </LinearLayout>
+</ScrollView>
