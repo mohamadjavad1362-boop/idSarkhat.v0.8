@@ -1,0 +1,5 @@
+plugins { id 'com.android.application' }
+
+android { namespace 'com.idsarkhat.v08'; compileSdk 35
+    defaultConfig { applicationId 'com.idsarkhat.v08'; minSdk 23; targetSdk 35; versionCode 8; versionName '0.8' }
+}
