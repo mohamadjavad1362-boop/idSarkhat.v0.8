@@ -2,20 +2,47 @@ package com.idsarkhat.v08;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
-import android.webkit.WebSettings;
+import android.provider.Settings;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.widget.*;
-import android.view.*;
 
 public class MainActivity extends Activity {
-    WebView web; TextView status; EditText url;
-    @Override public void onCreate(Bundle b){ super.onCreate(b); setContentView(R.layout.activity_main);
-        status=findViewById(R.id.status); url=findViewById(R.id.url); web=findViewById(R.id.web);
-        WebSettings s=web.getSettings(); s.setJavaScriptEnabled(true); s.setDomStorageEnabled(true); s.setSupportZoom(true);
-        web.setWebViewClient(new WebViewClient(){ @Override public void onPageFinished(WebView v,String u){ detect(u); }});
-        findViewById(R.id.open).setOnClickListener(v->{String u=url.getText().toString().trim(); if(!u.startsWith("http")) u="https://"+u; web.loadUrl(u);});
+    TextView status, packageText, pageText;
+    SharedPreferences prefs;
+
+    @Override public void onCreate(Bundle b) {
+        super.onCreate(b);
+        setContentView(R.layout.activity_main);
+        status = findViewById(R.id.status);
+        packageText = findViewById(R.id.packageText);
+        pageText = findViewById(R.id.pageText);
+        prefs = getSharedPreferences("idsarkhat", MODE_PRIVATE);
+
+        findViewById(R.id.accessibility).setOnClickListener(v ->
+            startActivity(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)));
+
+        findViewById(R.id.register).setOnClickListener(v -> {
+            String last = prefs.getString("last_package", "");
+            if (last.isEmpty()) {
+                status.setText("ابتدا Accessibility را فعال کن و وارد EasyTrader شو.");
+            } else {
+                prefs.edit().putString("target_package", last).apply();
+                status.setText("برنامه هدف ثبت شد: " + last);
+                packageText.setText("EasyTrader هدف: " + last);
+            }
+        });
+
+        findViewById(R.id.read).setOnClickListener(v -> readData());
+        readData();
     }
-    void detect(String u){ boolean easy=u.toLowerCase().contains("easytrader")||u.toLowerCase().contains("emofid"); status.setText(easy?"صفحه EasyTrader شناسایی شد: دریافت قیمت آماده آزمایش":"صفحه باز شد؛ EasyTrader هنوز شناسایی نشده است"); }
-    @Override public void onBackPressed(){ if(web.canGoBack()) web.goBack(); else super.onBackPressed(); }
+
+    private void readData() {
+        String last = prefs.getString("last_package", "—");
+        String target = prefs.getString("target_package", "—");
+        String data = prefs.getString("page_text", "");
+        packageText.setText("آخرین برنامه: " + last + "\nبرنامه هدف: " + target);
+        pageText.setText(data.isEmpty() ? "هنوز داده‌ای از صفحه هدف دریافت نشده است." : data);
+        status.setText(data.isEmpty() ? "منتظر داده از EasyTrader" : "داده صفحه دریافت شد");
+    }
 }
