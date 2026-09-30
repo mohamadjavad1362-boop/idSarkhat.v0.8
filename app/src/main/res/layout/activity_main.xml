@@ -32,11 +32,11 @@
             android:layout_width="match_parent" android:layout_height="wrap_content"/>
 
         <Button android:id="@+id/accessibility" android:text="۱  فعال‌سازی دسترسی خواندن صفحه"
-            android:textColor="#12304A" android:background="@drawable/bg_secondary_button"
+            android:textColor="#12304A" android:background="@drawable/bg_secondary_button" android:minHeight="48dp"
             android:layout_marginTop="8dp"
             android:layout_width="match_parent" android:layout_height="wrap_content"/>
         <Button android:id="@+id/register" android:text="۲  شناسایی و ثبت EasyTrader"
-            android:textColor="#FFFFFF" android:background="@drawable/bg_primary_button"
+            android:textColor="#FFFFFF" android:background="@drawable/bg_primary_button" android:minHeight="48dp"
             android:layout_marginTop="8dp"
             android:layout_width="match_parent" android:layout_height="wrap_content"/>
         <Button android:id="@+id/read" android:text="۳  دریافت و به‌روزرسانی داده"
