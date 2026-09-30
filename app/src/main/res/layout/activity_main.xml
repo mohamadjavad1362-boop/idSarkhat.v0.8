@@ -1,23 +1,80 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent">
-    <LinearLayout android:orientation="vertical" android:padding="16dp"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@drawable/bg_app" android:fillViewport="true">
+    <LinearLayout android:orientation="vertical" android:padding="18dp"
         android:layout_width="match_parent" android:layout_height="wrap_content">
-        <TextView android:id="@+id/status" android:text="آماده" android:textSize="17sp"
-            android:layout_width="match_parent" android:layout_height="wrap_content" android:paddingBottom="10dp"/>
-        <Button android:id="@+id/accessibility" android:text="۱) فعال‌کردن دسترسی خواندن صفحه"
+
+        <TextView android:text="idSarkhat"
+            android:textSize="30sp" android:textStyle="bold" android:textColor="#12304A"
             android:layout_width="match_parent" android:layout_height="wrap_content"/>
-        <Button android:id="@+id/register" android:text="۲) ثبت آخرین برنامه به‌عنوان EasyTrader"
+        <TextView android:text="دستیار هوشمند EasyTrader"
+            android:textSize="15sp" android:textColor="#65758B"
+            android:paddingBottom="18dp"
             android:layout_width="match_parent" android:layout_height="wrap_content"/>
-        <Button android:id="@+id/read" android:text="۳) خواندن صفحه و دریافت داده"
+
+        <LinearLayout android:orientation="vertical" android:padding="18dp"
+            android:background="@drawable/bg_card"
+            android:layout_width="match_parent" android:layout_height="wrap_content">
+            <TextView android:text="وضعیت سیستم" android:textStyle="bold"
+                android:textSize="18sp" android:textColor="#12304A"
+                android:layout_width="match_parent" android:layout_height="wrap_content"/>
+            <TextView android:id="@+id/status" android:text="آماده"
+                android:textSize="15sp" android:textColor="#3F5368"
+                android:paddingTop="8dp"
+                android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <Space android:layout_width="match_parent" android:layout_height="12dp"/>
+
+        <TextView android:text="راه‌اندازی"
+            android:textSize="17sp" android:textStyle="bold" android:textColor="#12304A"
             android:layout_width="match_parent" android:layout_height="wrap_content"/>
-        <TextView android:id="@+id/packageText" android:text="آخرین برنامه: —"
-            android:layout_width="match_parent" android:layout_height="wrap_content" android:paddingTop="8dp"/>
-        <TextView android:id="@+id/pageText" android:text="داده‌های صفحه اینجا نمایش داده می‌شود"
-            android:textSize="15sp" android:paddingTop="12dp"
+
+        <Button android:id="@+id/accessibility" android:text="۱  فعال‌سازی دسترسی خواندن صفحه"
+            android:textColor="#12304A" android:background="@drawable/bg_secondary_button"
+            android:layout_marginTop="8dp"
             android:layout_width="match_parent" android:layout_height="wrap_content"/>
-        <TextView android:text="ارسال سفارش واقعی پس از شناسایی دقیق فیلدهای سفارش EasyTrader فعال می‌شود؛ قبل از آن هیچ سفارش واقعی ارسال نمی‌شود."
-            android:textSize="14sp" android:paddingTop="18dp"
+        <Button android:id="@+id/register" android:text="۲  شناسایی و ثبت EasyTrader"
+            android:textColor="#FFFFFF" android:background="@drawable/bg_primary_button"
+            android:layout_marginTop="8dp"
+            android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <Button android:id="@+id/read" android:text="۳  دریافت و به‌روزرسانی داده"
+            android:textColor="#12304A" android:background="@drawable/bg_secondary_button"
+            android:layout_marginTop="8dp"
+            android:layout_width="match_parent" android:layout_height="wrap_content"/>
+
+        <Space android:layout_width="match_parent" android:layout_height="16dp"/>
+
+        <LinearLayout android:orientation="vertical" android:padding="18dp"
+            android:background="@drawable/bg_card"
+            android:layout_width="match_parent" android:layout_height="wrap_content">
+            <TextView android:text="اطلاعات اتصال"
+                android:textStyle="bold" android:textSize="18sp" android:textColor="#12304A"
+                android:layout_width="match_parent" android:layout_height="wrap_content"/>
+            <TextView android:id="@+id/packageText" android:text="آخرین برنامه: —"
+                android:textSize="14sp" android:textColor="#52667A"
+                android:paddingTop="10dp"
+                android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <Space android:layout_width="match_parent" android:layout_height="12dp"/>
+
+        <LinearLayout android:orientation="vertical" android:padding="18dp"
+            android:background="@drawable/bg_card"
+            android:layout_width="match_parent" android:layout_height="wrap_content">
+            <TextView android:text="داده‌های بازار"
+                android:textStyle="bold" android:textSize="18sp" android:textColor="#12304A"
+                android:layout_width="match_parent" android:layout_height="wrap_content"/>
+            <TextView android:id="@+id/pageText" android:text="داده‌های صفحه اینجا نمایش داده می‌شود"
+                android:textSize="14sp" android:textColor="#52667A"
+                android:paddingTop="10dp"
+                android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <TextView android:text="حالت فعلی: فقط خواندن و تشخیص صفحه. ارسال سفارش واقعی هنوز فعال نیست."
+            android:textSize="13sp" android:textColor="#718096"
+            android:gravity="center" android:paddingTop="18dp" android:paddingBottom="8dp"
             android:layout_width="match_parent" android:layout_height="wrap_content"/>
     </LinearLayout>
 </ScrollView>
