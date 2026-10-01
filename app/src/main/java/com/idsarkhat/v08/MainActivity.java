@@ -16,7 +16,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class MainActivity {
+public class MainActivity extends Activity {
     private static final String EASY = "ir.easytrader.orbis.m.twa";
     private static final String PREFS = "idsarkhat";
 
@@ -184,7 +184,7 @@ public class MainActivity {
         if (manager == null) return false;
 
         for (AccessibilityServiceInfo info :
-                manager.getEnabledAccessibilityServiceList(AccessibilityManager.FEEDBACK_GENERIC)) {
+                manager.getEnabledAccessibilityServiceList(AccessibilityManager.FEEDBACK_ALL_MASK)) {
             if (info == null || info.getResolveInfo() == null ||
                     info.getResolveInfo().serviceInfo == null) continue;
 
