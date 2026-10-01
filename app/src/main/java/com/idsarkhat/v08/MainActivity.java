@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.accessibilityservice.AccessibilityServiceInfo;
 import android.view.accessibility.AccessibilityManager;
 import android.widget.TextView;
 
@@ -15,7 +16,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class MainActivity extends Activity {
+public class MainActivity {
     private static final String EASY = "ir.easytrader.orbis.m.twa";
     private static final String PREFS = "idsarkhat";
 
@@ -50,16 +51,12 @@ public class MainActivity extends Activity {
                 status.setText("⚠ ابتدا دسترسی «خواندن صفحه» را فعال کن.");
                 return;
             }
-
             if (!isEasyTraderInstalled()) {
                 status.setText("⚠ EasyTrader روی گوشی پیدا نشد.");
                 return;
             }
 
-            prefs.edit()
-                    .putString("target_package", EASY)
-                    .apply();
-
+            prefs.edit().putString("target_package", EASY).apply();
             readData();
 
             if (!hasFreshData()) {
@@ -102,9 +99,7 @@ public class MainActivity extends Activity {
                 return;
             }
 
-            launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(launch);
-
             status.setText("✓ EasyTrader باز شد؛ منتظر شناسایی صفحه و دریافت داده...");
 
             handler.postDelayed(() -> {
@@ -114,7 +109,7 @@ public class MainActivity extends Activity {
                 } else {
                     status.setText("در انتظار شناسایی صفحه EasyTrader و دریافت داده...");
                 }
-            }, 1200);
+            }, 1500);
 
         } catch (Exception e) {
             status.setText("⚠ راه‌اندازی EasyTrader انجام نشد: " + e.getClass().getSimpleName());
@@ -127,9 +122,8 @@ public class MainActivity extends Activity {
         boolean detected = prefs.getBoolean("easytrader_detected", false);
         long ts = prefs.getLong("page_timestamp", 0L);
 
-        String time = ts == 0
-                ? "—"
-                : new SimpleDateFormat("HH:mm:ss", Locale.US).format(new Date(ts));
+        String time = ts == 0 ? "—" :
+                new SimpleDateFormat("HH:mm:ss", Locale.US).format(new Date(ts));
 
         packageText.setText(
                 "بسته EasyTrader: " + EASY
@@ -143,19 +137,12 @@ public class MainActivity extends Activity {
         String prices = prefs.getString("price_candidates", "");
 
         StringBuilder market = new StringBuilder();
-        if (prices.isEmpty()) {
-            market.append("قیمت عددی هنوز استخراج نشده است.");
-        } else {
-            market.append("قیمت/اعداد: ").append(prices);
-        }
+        if (prices.isEmpty()) market.append("قیمت عددی هنوز استخراج نشده است.");
+        else market.append("قیمت/اعداد: ").append(prices);
 
         market.append("\n\n");
-        if (data.isEmpty()) {
-            market.append("متن صفحه هنوز دریافت نشده است.");
-        } else {
-            market.append(data);
-        }
-
+        if (data.isEmpty()) market.append("متن صفحه هنوز دریافت نشده است.");
+        else market.append(data);
         pageText.setText(market.toString());
 
         if (!enabled) {
@@ -180,7 +167,11 @@ public class MainActivity extends Activity {
 
     private boolean isEasyTraderInstalled() {
         try {
-            getPackageManager().getPackageInfo(EASY, PackageManager.PackageInfoFlags.of(0));
+            if (android.os.Build.VERSION.SDK_INT >= 33) {
+                getPackageManager().getPackageInfo(EASY, PackageManager.PackageInfoFlags.of(0));
+            } else {
+                getPackageManager().getPackageInfo(EASY, 0);
+            }
             return true;
         } catch (Exception e) {
             return false;
@@ -190,14 +181,23 @@ public class MainActivity extends Activity {
     private boolean isAccessibilityEnabled() {
         AccessibilityManager manager =
                 (AccessibilityManager) getSystemService(Context.ACCESSIBILITY_SERVICE);
-
         if (manager == null) return false;
 
-        String enabled = manager
-                .getEnabledAccessibilityServiceList(AccessibilityManager.FEEDBACK_ALL_MASK)
-                .toString();
+        for (AccessibilityServiceInfo info :
+                manager.getEnabledAccessibilityServiceList(AccessibilityManager.FEEDBACK_GENERIC)) {
+            if (info == null || info.getResolveInfo() == null ||
+                    info.getResolveInfo().serviceInfo == null) continue;
 
-        return enabled.contains(getPackageName() + "/.EasyTraderAccessibilityService")
-                || enabled.contains(getPackageName() + "/" + getPackageName() + ".EasyTraderAccessibilityService");
+            String pkg = info.getResolveInfo().serviceInfo.packageName;
+            String cls = info.getResolveInfo().serviceInfo.name;
+
+            if (getPackageName().equals(pkg) &&
+                    (cls.endsWith(".EasyTraderAccessibilityService") ||
+                     cls.equals(EasyTraderAccessibilityService.class.getName()))) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
