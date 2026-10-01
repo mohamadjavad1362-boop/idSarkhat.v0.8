@@ -184,7 +184,7 @@ public class MainActivity extends Activity {
         if (manager == null) return false;
 
         for (AccessibilityServiceInfo info :
-                manager.getEnabledAccessibilityServiceList(AccessibilityManager.FEEDBACK_ALL_MASK)) {
+                manager.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK)) {
             if (info == null || info.getResolveInfo() == null ||
                     info.getResolveInfo().serviceInfo == null) continue;
 
