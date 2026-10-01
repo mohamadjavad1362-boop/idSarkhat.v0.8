@@ -20,10 +20,24 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.7'
-      - name: Build debug APK
-        run: gradle assembleDebug
+      - name: Build release APK
+        run: gradle assembleRelease
+      - name: Create temporary test signing key
+        run: |
+          keytool -genkeypair -v \
+            -keystore "$RUNNER_TEMP/idSarkhat-test.jks" \
+            -storepass android -keypass android \
+            -alias idSarkhatTest -keyalg RSA -keysize 2048 -validity 10000 \
+            -dname "CN=idSarkhat Test, OU=Development, O=idSarkhat, L=Test, ST=Test, C=US"
+      - name: Align and sign release APK
+        run: |
+          ZIPALIGN="$ANDROID_HOME/build-tools/35.0.0/zipalign"
+          APKSIGNER="$ANDROID_HOME/build-tools/35.0.0/apksigner"
+          "$ZIPALIGN" -f 4 app/build/outputs/apk/release/app-release-unsigned.apk app/build/outputs/apk/release/idSarkhat-v0.8-release.apk
+          "$APKSIGNER" sign --ks "$RUNNER_TEMP/idSarkhat-test.jks" --ks-pass pass:android --key-pass pass:android --out app/build/outputs/apk/release/idSarkhat-v0.8-release.apk app/build/outputs/apk/release/idSarkhat-v0.8-release.apk
+          "$APKSIGNER" verify --verbose app/build/outputs/apk/release/idSarkhat-v0.8-release.apk
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: idSarkhat-v0.8-debug
-          path: app/build/outputs/apk/debug/app-debug.apk
+          name: idSarkhat-v0.8-release-test-signed
+          path: app/build/outputs/apk/release/idSarkhat-v0.8-release.apk
