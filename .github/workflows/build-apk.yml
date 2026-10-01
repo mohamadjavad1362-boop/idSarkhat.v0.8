@@ -1,4 +1,5 @@
 name: Build APK
+# Release test build
 on:
   push:
     branches: [ main ]
