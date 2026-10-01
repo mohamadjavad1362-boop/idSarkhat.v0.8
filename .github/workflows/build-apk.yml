@@ -1,6 +1,5 @@
 name: Build APK
-# Release build with persistent signing support.
-# If repository secrets are configured, the same signing certificate is used on every build.
+
 on:
   push:
     branches: [ main ]
@@ -9,6 +8,12 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      IDSARKHAT_KEYSTORE_B64: ${{ secrets.IDSARKHAT_KEYSTORE_B64 }}
+      IDSARKHAT_KEYSTORE_PASSWORD: ${{ secrets.IDSARKHAT_KEYSTORE_PASSWORD }}
+      IDSARKHAT_KEY_ALIAS: ${{ secrets.IDSARKHAT_KEY_ALIAS }}
+      IDSARKHAT_KEY_PASSWORD: ${{ secrets.IDSARKHAT_KEY_PASSWORD }}
+
     steps:
       - uses: actions/checkout@v4
 
@@ -30,49 +35,30 @@ jobs:
       - name: Build release APK
         run: gradle assembleRelease
 
-      - name: Prepare persistent signing key
-        if: ${{ secrets.IDSARKHAT_KEYSTORE_B64 != '' }}
-        env:
-          KEYSTORE_B64: ${{ secrets.IDSARKHAT_KEYSTORE_B64 }}
+      - name: Prepare signing key
         run: |
-          echo "$KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/idSarkhat-release.jks"
-          test -s "$RUNNER_TEMP/idSarkhat-release.jks"
+          if [ -n "$IDSARKHAT_KEYSTORE_B64" ]; then
+            echo "$IDSARKHAT_KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/idSarkhat-release.jks"
+            test -s "$RUNNER_TEMP/idSarkhat-release.jks"
+            echo "SIGNING_MODE=persistent" >> "$GITHUB_ENV"
+          else
+            keytool -genkeypair -v               -keystore "$RUNNER_TEMP/idSarkhat-test.jks"               -storepass android -keypass android               -alias idSarkhatTest -keyalg RSA -keysize 2048 -validity 10000               -dname "CN=idSarkhat Test, OU=Development, O=idSarkhat, L=Test, ST=Test, C=US"
+            echo "SIGNING_MODE=test" >> "$GITHUB_ENV"
+          fi
 
-      - name: Create temporary test signing key (fallback)
-        if: ${{ secrets.IDSARKHAT_KEYSTORE_B64 == '' }}
-        run: |
-          keytool -genkeypair -v \
-            -keystore "$RUNNER_TEMP/idSarkhat-test.jks" \
-            -storepass android -keypass android \
-            -alias idSarkhatTest -keyalg RSA -keysize 2048 -validity 10000 \
-            -dname "CN=idSarkhat Test, OU=Development, O=idSarkhat, L=Test, ST=Test, C=US"
-
-      - name: Align and sign release APK
-        env:
-          USE_PERSISTENT: ${{ secrets.IDSARKHAT_KEYSTORE_B64 != '' }}
-          KEYSTORE_PASSWORD: ${{ secrets.IDSARKHAT_KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.IDSARKHAT_KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.IDSARKHAT_KEY_PASSWORD }}
+      - name: Align and sign APK
         run: |
           ZIPALIGN="$ANDROID_HOME/build-tools/35.0.0/zipalign"
           APKSIGNER="$ANDROID_HOME/build-tools/35.0.0/apksigner"
           INPUT="app/build/outputs/apk/release/app-release-unsigned.apk"
           OUTPUT="app/build/outputs/apk/release/idSarkhat-v0.8-release.apk"
+
           "$ZIPALIGN" -f 4 "$INPUT" "$OUTPUT"
 
-          if [ "$USE_PERSISTENT" = "true" ]; then
-            "$APKSIGNER" sign \
-              --ks "$RUNNER_TEMP/idSarkhat-release.jks" \
-              --ks-pass "pass:$KEYSTORE_PASSWORD" \
-              --ks-key-alias "$KEY_ALIAS" \
-              --key-pass "pass:$KEY_PASSWORD" \
-              "$OUTPUT"
+          if [ "$SIGNING_MODE" = "persistent" ]; then
+            "$APKSIGNER" sign               --ks "$RUNNER_TEMP/idSarkhat-release.jks"               --ks-pass "pass:$IDSARKHAT_KEYSTORE_PASSWORD"               --ks-key-alias "$IDSARKHAT_KEY_ALIAS"               --key-pass "pass:$IDSARKHAT_KEY_PASSWORD"               "$OUTPUT"
           else
-            "$APKSIGNER" sign \
-              --ks "$RUNNER_TEMP/idSarkhat-test.jks" \
-              --ks-pass pass:android \
-              --key-pass pass:android \
-              "$OUTPUT"
+            "$APKSIGNER" sign               --ks "$RUNNER_TEMP/idSarkhat-test.jks"               --ks-pass pass:android               --key-pass pass:android               --ks-key-alias idSarkhatTest               "$OUTPUT"
           fi
 
           "$APKSIGNER" verify --verbose "$OUTPUT"
